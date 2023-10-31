@@ -1,0 +1,200 @@
+//This class is created to add the multiple data from excel file to Web aplication Used for Moderna Pharma.
+
+package tests.authenticationTest;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Select;
+
+import com.google.common.collect.Table.Cell;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
+
+public class ExcelDataModerna {
+@SuppressWarnings("unused")
+public static void main(String[] args) throws InterruptedException, IOException
+{
+
+WebDriverManager.chromedriver().setup();
+WebDriver driver= new ChromeDriver();
+
+
+driver.get(" http://ram-gmp-t/ram/xxxxxx ");
+
+// Maximize window size of browser
+driver.manage().window().maximize();
+Thread.sleep(2000);
+driver.findElement(By.xpath("//select[@onchange='UpdateLoginForm();']")).click();
+Thread.sleep(2000);
+driver.findElement(By.xpath("//option[text()='Moderna (MODERNA)']")).click();
+
+// Enter your login email id
+driver.findElement(By.xpath("//input[@name='txtUserName']")).sendKeys("xxxxxxxxx");
+
+
+// Enter your login password
+driver.findElement(By.xpath("//input[@name='txtPassword']")).sendKeys("xxxxxxxxx");
+
+
+driver.findElement(By.xpath("//span[@id='btnMidbtnLogin']")).click();
+Thread.sleep(10000);
+
+driver.findElement(By.xpath("//a[text()='Go To']")).click();
+
+
+driver.findElement(By.xpath("//a[@data-menuvalue='OPT_QUERY']")).click();
+
+
+WebElement Event = driver.findElement(By.xpath("(//a[text()='Events'])"));
+
+Actions act = new Actions(driver);
+
+act.doubleClick(Event).build().perform();
+
+
+driver.findElement(By.xpath("//div[@id='panelView1_ToggleBar']")).click();
+
+WebElement MaintenanceEvent= driver.findElement(By.xpath("(//a[text()='Maintenance Event'])[1]"));
+
+act.doubleClick(MaintenanceEvent).build().perform();
+
+
+WebElement AllMaintenanceEvents= driver.findElement(By.xpath("//a[text()='All Maintenance Events']//parent::li"));
+
+act.doubleClick(AllMaintenanceEvents).build().perform();
+Thread.sleep(6000);
+
+driver.switchTo().frame("panelView2_Panel3_Body");
+
+
+WebElement newEvent= driver.findElement(By.xpath("//li[@id='itemList_MB1_Menu3']"));
+
+act.doubleClick(newEvent).build().perform();
+
+
+//switch to frame pop-up
+driver.switchTo().parentFrame();
+driver.switchTo().frame("SysWizardWindow");
+
+Thread.sleep(8000);
+driver.findElement(By.xpath("//label[text()='Shared']//parent::span//input")).click();
+
+
+driver.findElement(By.xpath("//span[text()='Next']")).click();
+
+Thread.sleep(8000);
+//clicked on maintenance radio button
+driver.findElement(By.xpath("(//input[@name='EventType'])[4]")).click();
+
+driver.findElement(By.xpath("//span[text()='Next']")).click();
+
+
+// Enter the Event Name in Provided by Excel
+WebElement searchWorkOrder= driver.findElement(By.xpath("//input[@id='fld5113006']"));
+
+// File file =new File("D:\\Tested File-PlannedStartEnd.xlsx");
+File file =new File("C:\\Users\\RKakade\\Desktop\\dipak\\event.xlsx");
+FileInputStream fis= new FileInputStream(file);
+XSSFWorkbook workbook= new XSSFWorkbook(fis);
+XSSFSheet sheet= workbook.getSheetAt(0);
+
+String cellValue= sheet.getRow(1).getCell(1).getStringCellValue();
+System.out.println(cellValue);
+searchWorkOrder.sendKeys(cellValue);
+Thread.sleep(10000);
+
+// Click the Next Button After Entering the Event Name
+driver.findElement(By.xpath("//span[@id='lblButtonbtnNext']")).click();
+
+
+// Click the Next Button After Selecting the Rule Name
+driver.findElement(By.xpath("//span[@id='lblButtonbtnNext']")).click();
+
+
+// Select the Wizard to complete the adding the Events
+driver.findElement(By.xpath("(//input[@name='rbRecOptions'])[2]")).click();
+Thread.sleep(6000);
+
+// Click the Finish Button for Completing the Event
+driver.findElement(By.xpath("//*[text()='Finish']")).click();
+
+
+//switch to frame pop-up
+String parent=driver.getWindowHandle();
+
+Set<String>s=driver.getWindowHandles();
+
+// Now iterate using Iterator
+Iterator<String> I1= s.iterator();
+
+while(I1.hasNext())
+{
+
+String child_window=I1.next();
+
+if(!parent.equals(child_window))
+
+driver.switchTo().window(child_window);
+
+System.out.println(driver.switchTo().window(child_window).getTitle());
+
+// driver.manage().window().maximize();
+
+}
+driver.switchTo().parentFrame();
+driver.switchTo().frame(0);
+driver.switchTo().frame(0);
+
+
+// Click the Finish Button for Completing the Event
+driver.findElement(By.xpath("//label[@id='lblQuestion']//parent::div//following::a[@id='btnOk']")).click();
+
+
+//switch to frame pop-up
+//Switch to Frame using id of the frame
+driver.switchTo().frame("childmain");
+
+//Identifying the heading in webelement
+WebElement workRule= driver.findElement(By.xpath("(//span[text()='Work Rule to Assign']//parent::div//following::table[@class='inputComboMed'])[1]"));
+workRule.click();
+
+driver.findElement(By.xpath("((//span[text()='Work Rule to Assign']//parent::div//following::table[@class='inputComboMed'])[1]//tbody//tr//td)[1]")).click();
+
+
+WebElement eventDepartmenntMenu= driver.findElement(By.xpath("((//span[text()='Event Department']//parent::div//following::table[@class='inputComboMed'])//tbody//following::td)[3]"));
+eventDepartmenntMenu.click();
+
+driver.switchTo().parentFrame();
+driver.switchTo().frame(0);
+driver.switchTo().frame(0).getTitle();
+
+Select eventDepartmenntMenuGrid = new Select(driver.findElement(By.xpath("//select[@name='plPager']")));
+eventDepartmenntMenuGrid.selectByIndex(10);
+
+driver.findElement(By.xpath("//span[@id='lblButtonbtnOK']")).click();
+
+// Click On save button
+ driver.findElement(By.xpath("//a[@title='Save']")).click();
+ 
+
+//Close the Browser
+driver.close();
+
+
+
+}
+}
